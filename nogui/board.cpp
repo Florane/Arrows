@@ -12,13 +12,13 @@ Board::Board(int _time)
 	startTime = currentTime;
 	turn = 0;
 	prevPos = -1;
-	for(int i = 0;i < 64;i++)
+	for(int i = 0;i < SIZE*SIZE;i++)
 		board[i] = -1;
 }
 
 int Board::set(int pos, int rotation)
 {
-	if(pos < 0 || pos > 63 || rotation < 0 || rotation > 7)
+	if(pos < 0 || pos > SIZE*SIZE-1 || rotation < 0 || rotation > 7)
 		return -2;
 	if(prevPos >= 0)
 	{
@@ -26,19 +26,19 @@ int Board::set(int pos, int rotation)
 		{
 		case 0:
 		case 4:
-			if(!(pos%8 == prevPos%8)) return -1;
+			if(!(pos%SIZE == prevPos%SIZE)) return -1;
 			break;
 		case 1:
 		case 5:
-			if(!((pos%8+pos/8) == (prevPos%8+prevPos/8))) return -1;
+			if(!((pos%SIZE+pos/SIZE) == (prevPos%SIZE+prevPos/SIZE))) return -1;
 			break;
 		case 2:
 		case 6:
-			if(!(pos/8 == prevPos/8)) return -1;
+			if(!(pos/SIZE == prevPos/SIZE)) return -1;
 			break;
 		case 3:
 		case 7:
-			if(!((pos%8-pos/8) == (prevPos%8-prevPos/8))) return -1;
+			if(!((pos%SIZE-pos/SIZE) == (prevPos%SIZE-prevPos/SIZE))) return -1;
 			break;
 		default:
 			return -2;
@@ -61,15 +61,15 @@ int Board::checkStats()
 	if(time[0] < 0 || time[1] < 0)
 		return 1;
 
-	for(int i = 0;i < 8;i++)
-		if((board[(prevPos/8)*8+i] == -1 && (prevRot==2||prevRot==6)) || (board[(prevPos%8)+i*8] == -1 && (prevRot==0||prevRot==4)))
+	for(int i = 0;i < SIZE;i++)
+		if((board[(prevPos/SIZE)*SIZE+i] == -1 && (prevRot==2||prevRot==6)) || (board[(prevPos%SIZE)+i*SIZE] == -1 && (prevRot==0||prevRot==4)))
 			return 0;
 
-	int tests[4] = {-9,-7,7,9};
+	int tests[4] = {-SIZE-1,-SIZE+1,SIZE-1,SIZE+1};
 	int rot[4] = {1,1,3,3};
-	for(int s = 1;s < 8;s++)
+	for(int s = 1;s < SIZE;s++)
 		for(int i = 0;i < 4;i++)
-			if(prevPos+tests[i]*s >= 0 && prevPos+tests[i]*s < 64)
+			if(prevPos+tests[i]*s >= 0 && prevPos+tests[i]*s < SIZE*SIZE)
 				if(board[prevPos+tests[i]*s] == -1 && (prevRot==rot[i]||prevRot==8-rot[i]))
 					return 0;
 	return 2;
@@ -81,9 +81,9 @@ int Board::fill(int pos, int side)
 	int ret = 1;
 	board[pos] = -1;
 
-	int tests[4] = {-8,8,-1,1};
+	int tests[4] = {-SIZE,SIZE,-1,1};
 	for(int i = 0;i < 4;i++)
-		if(pos+tests[i] >= 0 && pos+tests[i] < 64)
+		if(pos+tests[i] >= 0 && pos+tests[i] < SIZE*SIZE)
 			ret += fill(pos+tests[i],side);
 
 	return ret;
@@ -94,13 +94,13 @@ int Board::check()
 	if(checkStats() == 0)
 		return 0;
 	
-	for(int i = 0;i < 64;i++)
+	for(int i = 0;i < SIZE*SIZE;i++)
 		if(board[i] == -1)
 			board[i] = (!turn)<<3;
 
 	int max = 0;
 	int side = 0;
-	for(int i = 0;i < 64;i++)
+	for(int i = 0;i < SIZE*SIZE;i++)
 	{
 		int fs = board[i]>>3;
 		int f = fill(i,board[i]>>3);
@@ -110,5 +110,5 @@ int Board::check()
 			side = fs;
 		}
 	}
-	return side?1:-1;
+	return (side?1:-1)*max;
 }

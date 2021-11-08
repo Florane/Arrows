@@ -1,8 +1,9 @@
 #pragma once
+#define SIZE 4
 
 class Board
 {
-	int board[64];
+	int board[SIZE*SIZE];
 	int time[2];
 	int turn;
 	int prevPos, prevRot;
@@ -16,6 +17,6 @@ public:
 
 	int set(int pos,int rotation);
 	int check();
-	int getBoard(int i) {if(i>=0&&i<64) return board[i]; else return -2;}
+	int getBoard(int i) {if(i>=0&&i<SIZE*SIZE) return board[i]; else return -2;}
 	int displayTime(int player) {return time[player?1:0];}
 };
