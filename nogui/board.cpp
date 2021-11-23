@@ -1,5 +1,6 @@
 #include "board.hpp"
 #include <chrono>
+#include <curses.h>
 #define currentTime std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count()
 
 int abs(int i){return i>=0?i:-i;}
@@ -12,6 +13,7 @@ Board::Board(int _time)
 	startTime = currentTime;
 	turn = 0;
 	prevPos = -1;
+	result = 0;
 	for(int i = 0;i < SIZE*SIZE;i++)
 		board[i] = -1;
 }
@@ -91,6 +93,8 @@ int Board::fill(int pos, int side)
 
 int Board::check()
 {
+	if(result != 0)
+		return result;
 	if(checkStats() == 0)
 		return 0;
 	
@@ -110,5 +114,6 @@ int Board::check()
 			side = fs;
 		}
 	}
-	return (side?1:-1)*max;
+	result = (side?1:-1)*max;
+	return result;
 }
